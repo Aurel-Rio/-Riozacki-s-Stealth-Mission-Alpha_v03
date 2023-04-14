@@ -1,4 +1,5 @@
-// Récupération du canvas et du contexte 2D
+import playSound from "./sound.js";
+
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
@@ -14,6 +15,20 @@ let leftPressed = false;
 let rightPressed = false;
 let upPressed = false;
 let downPressed = false;
+
+// Chargement des ressources
+function loadResources() {
+  // Chargement de l'image du sprite
+  const spriteImage = new Image();
+  spriteImage.src = "sprites/riozacki-back.png";
+
+  // Vérification que l'image a bien été chargée avant de démarrer le jeu
+  return new Promise((resolve) => {
+    spriteImage.onload = function () {
+      resolve();
+    };
+  });
+}
 
 // Fonction de mise à jour du jeu
 function update() {
@@ -32,14 +47,25 @@ function update() {
   }
 }
 
+// Coordonnées du sprite à extraire
+const spriteX = 0;
+const spriteY = 0;
+const spriteWidth = 32;
+const spriteHeight = 32;
+
+// Fonction de chargement du sprite
+function loadSprite() {
+  // Dessin du sprite sur le canvas
+  context.drawImage(spriteImage, playerX, playerY);
+}
+
 // Fonction de rendu du jeu
 function render() {
   // Effacement du canvas
   context.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
   // Dessin du joueur
-  context.fillStyle = "green";
-  context.fillRect(playerX, playerY, 20, 20);
+  loadSprite();
 }
 
 // Fonction de démarrage du jeu
@@ -82,22 +108,32 @@ function startGame() {
     window.requestAnimationFrame(main);
   }
 
-  // Lancement de la boucle de jeu
-  main();
-}
-
-// Fonction de chargement des ressources
-function loadResources() {
-  // Code à ajouter pour charger les ressources (images, sons, etc.)
-}
-
-// Gestionnaire d'événement pour le bouton "1 joueur"
-document.getElementById("button-one-player").addEventListener("click", function () {
-  // Masquage de l'écran titre et affichage de l'écran de jeu
-  document.getElementById("title-screen").style.display = "none";
-  document.getElementById("game-screen").style.display = "block";
-
   // Chargement des ressources et démarrage du jeu
-  loadResources();
+  loadResources().then(() => {
+    main();
+  });
+}
+
+// Attente du clic sur le bouton "Jouer"
+document.getElementById("player1").addEventListener("click", () => {
+  document.getElementById("menu").style.display = "none";
+  startGame();
+});
+
+// Attente du clic sur le bouton "Sons"
+const soundsMenu = document.getElementById("sounds-menu");
+const soundsButton = document.getElementById("button-sounds");
+soundsButton.addEventListener("click", function () {
+  soundsMenu.style.display = soundsMenu.style.display === "none" ? "block" : "none";
+});
+
+// Attente du clic sur le bouton "Retour"
+const backButton = document.getElementById("button-back");
+backButton.addEventListener("click", function () {
+  soundsMenu.style.display = "none";
+});
+
+// Chargement des ressources et démarrage du jeu
+loadResources().then(() => {
   startGame();
 });
